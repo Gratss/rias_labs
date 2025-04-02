@@ -97,17 +97,24 @@ def save_history(history):
         logging.error(f"Ошибка сохранения истории: {e}")
 
 
-def add_to_history(user_id, data_type, value):
-    history = load_history()
-    user_id_str = str(user_id)
-
-    if user_id_str not in history:
-        history[user_id_str] = {"email": [], "ip": [], "phone": []}
-
-    if value not in history[user_id_str][data_type]:
-        history[user_id_str][data_type].append(value)
-
-    save_history(history)
+def add_to_history(user_id: int, data_type: str, value: str):
+    """Добавляет запись в историю пользователя"""
+    try:
+        user_id_str = str(user_id)
+        
+        # Создаем структуру, если её нет
+        if user_id_str not in history:
+            history[user_id_str] = {}
+        
+        if data_type not in history[user_id_str]:
+            history[user_id_str][data_type] = []
+        
+        # Добавляем значение, если его еще нет
+        if value not in history[user_id_str][data_type]:
+            history[user_id_str][data_type].append(value)
+            save_history()
+    except Exception as e:
+        logging.error(f"Ошибка при добавлении в историю: {e}")
 
 
 # Устанавливаем команды, доступные в боте
@@ -265,7 +272,6 @@ NODES = [Node(i) for i in range(3)]
 
 # Функция для инициализации сети
 async def initialize_network():
-    # Пример топологии сети (можно настроить по необходимости)
     NODES[0].neighbors = [NODES[1], NODES[2]]
     NODES[1].neighbors = [NODES[0], NODES[2]]
     NODES[2].neighbors = [NODES[0], NODES[1]]
